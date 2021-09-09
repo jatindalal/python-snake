@@ -1,5 +1,6 @@
 import pygame
 from pygame.locals import *
+import time
 
 class Snake:
     def __init__(self, parent_screen) -> None:
@@ -7,6 +8,7 @@ class Snake:
         self.block = pygame.image.load("block.jpg").convert()
         self.x = 200
         self.y = 200
+        self.direction = "right"
 
     def draw(self):
         self.parent_screen.fill((200, 200, 200))
@@ -14,16 +16,26 @@ class Snake:
         pygame.display.flip()
 
     def move_left(self):
-        self.x -= 5
-        self.draw()
+        self.direction = "left"
+
     def move_right(self):
-        self.x += 5
-        self.draw()
+        self.direction = "right"
+
     def move_up(self):
-        self.y -= 5
-        self.draw()
+        self.direction = "up"
+
     def move_down(self):
-        self.y += 5
+        self.direction = "down"
+    
+    def crawl(self):
+        if self.direction == "up":
+            self.y -= 10
+        elif self.direction == "down":
+            self.y += 10
+        elif self.direction == "left":
+            self.x -= 10
+        elif self.direction == "right":
+            self.x += 10
         self.draw()
 
 
@@ -44,6 +56,8 @@ class Game:
                         running = False
                     if event.key == K_UP:
                         self.snake.move_up()
+                        print("up")
+                        print(self.snake.direction)
                     if event.key == K_DOWN:
                         self.snake.move_down()
                     if event.key == K_LEFT:
@@ -52,6 +66,8 @@ class Game:
                         self.snake.move_right()
                 elif event.type == QUIT:
                     running = False
+            self.snake.crawl()
+            time.sleep(0.2)
 
 if __name__ == "__main__":
     game = Game()

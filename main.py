@@ -56,8 +56,6 @@ class Game:
                         running = False
                     if event.key == K_UP:
                         self.snake.move_up()
-                        print("up")
-                        print(self.snake.direction)
                     if event.key == K_DOWN:
                         self.snake.move_down()
                     if event.key == K_LEFT:

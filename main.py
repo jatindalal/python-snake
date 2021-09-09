@@ -29,13 +29,13 @@ class Snake:
     
     def crawl(self):
         if self.direction == "up":
-            self.y -= 10
+            self.y -= 12
         elif self.direction == "down":
-            self.y += 10
+            self.y += 12
         elif self.direction == "left":
-            self.x -= 10
+            self.x -= 12
         elif self.direction == "right":
-            self.x += 10
+            self.x += 12
         self.draw()
 
 
@@ -54,13 +54,13 @@ class Game:
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
                         running = False
-                    if event.key == K_UP:
+                    if event.key == K_UP and self.snake.direction != "down":
                         self.snake.move_up()
-                    if event.key == K_DOWN:
+                    if event.key == K_DOWN and self.snake.direction != "up":
                         self.snake.move_down()
-                    if event.key == K_LEFT:
+                    if event.key == K_LEFT and self.snake.direction != "right":
                         self.snake.move_left()
-                    if event.key == K_RIGHT:
+                    if event.key == K_RIGHT and self.snake.direction != "left":
                         self.snake.move_right()
                 elif event.type == QUIT:
                     running = False

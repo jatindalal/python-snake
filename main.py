@@ -1,8 +1,11 @@
 import pygame
 from pygame.locals import *
 import time
+import random
 
 SIZE = 40
+WIDTH = 640
+HEIGHT = 480
 
 class Fruit:
     def __init__(self, parent_screen) -> None:
@@ -13,8 +16,11 @@ class Fruit:
     
     def draw(self):
         self.parent_screen.blit(self.image, (self.x, self.y))
-
         pygame.display.flip()
+
+    def move(self):
+        self.x = random.randint(1, WIDTH/SIZE - 1) * SIZE
+        self.y = random.randint(1, HEIGHT/SIZE - 1) * SIZE
 
 
 class Snake:
@@ -25,6 +31,11 @@ class Snake:
         self.x = [SIZE]*length
         self.y = [SIZE]*length
         self.direction = "right"
+
+    def increment_length(self):
+        self.length += 1
+        self.x.append(-1)
+        self.y.append(-1)
 
     def draw(self):
         self.parent_screen.fill((0, 0, 0))
@@ -66,16 +77,33 @@ class Snake:
 class Game:
     def __init__(self) -> None:
         pygame.init()
-        self.surface = pygame.display.set_mode((640, 480))
+        self.surface = pygame.display.set_mode((WIDTH, HEIGHT))
         self.surface.fill((200, 200, 200))
-        self.snake = Snake(self.surface, 10)
+        self.snake = Snake(self.surface, 2)
         self.fruit = Fruit(self.surface)
         self.snake.draw()
         self.fruit.draw()
 
+    def is_collision(self, x1, y1, x2, y2):
+        if x1 >= x2 and x1 < (x2 + SIZE):
+            if y1 >= y2 and y1 < (y2 + SIZE):
+                return True
+        return False
+
     def play(self):
         self.snake.crawl()
         self.fruit.draw()
+        self.display_score()
+        pygame.display.flip()
+
+        if self.is_collision(self.snake.x[0], self.snake.y[0], self.fruit.x, self.fruit.y):
+            self.snake.increment_length()
+            self.fruit.move()
+
+    def display_score(self):
+        font = pygame.font.SysFont('arial',25)
+        score = font.render(f"Score: {self.snake.length}",True,(200,200,200))
+        self.surface.blit(score,(WIDTH - 3 * SIZE, SIZE))
 
     def run(self):
         running = True
@@ -96,7 +124,7 @@ class Game:
                     running = False
                 
             self.play()
-            time.sleep(0.3)
+            time.sleep(0.2)
 
 if __name__ == "__main__":
     game = Game()

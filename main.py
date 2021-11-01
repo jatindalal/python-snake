@@ -6,6 +6,7 @@ import random
 SIZE = 40
 WIDTH = 640
 HEIGHT = 480
+BG_COLOR= (110, 110, 5)
 
 class Fruit:
     def __init__(self, parent_screen) -> None:
@@ -90,40 +91,72 @@ class Game:
                 return True
         return False
 
+
     def play(self):
         self.snake.crawl()
         self.fruit.draw()
         self.display_score()
         pygame.display.flip()
-
+    
+        # collision with fruit
         if self.is_collision(self.snake.x[0], self.snake.y[0], self.fruit.x, self.fruit.y):
             self.snake.increment_length()
             self.fruit.move()
 
+        # collision with body
+        for i in range(2, self.snake.length):
+            if self.is_collision(self.snake.x[0], self.snake.y[0], self.snake.x[i], self.snake.y[i]):
+                raise "Collision Occured"
+
+    def reset(self):
+        self.snake = Snake(self.surface, 2)
+        self.fruit = Fruit(self.surface)
+
+    def game_over(self):
+        self.surface.fill(BG_COLOR)
+        font = pygame.font.SysFont('arial', 25)
+        line1 = font.render(f"Game is over! Your score is {self.snake.length}", True, (255, 255, 255))
+        self.surface.blit(line1, (150, 300))
+        line2 = font.render("To play again press Enter. To exit press Escape!", True, (255, 255, 255))
+        self.surface.blit(line2, (150, 350))
+
+        pygame.display.flip()
+
     def display_score(self):
         font = pygame.font.SysFont('arial',25)
-        score = font.render(f"Score: {self.snake.length}",True,(200,200,200))
+        score = font.render(f"Score: {self.snake.length - 2}",True,(200,200,200))
         self.surface.blit(score,(WIDTH - 3 * SIZE, SIZE))
 
     def run(self):
         running = True
+        pause = False
+
         while running :
             for event in pygame.event.get():
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
                         running = False
-                    if event.key == K_UP and self.snake.direction != "down":
-                        self.snake.move_up()
-                    if event.key == K_DOWN and self.snake.direction != "up":
-                        self.snake.move_down()
-                    if event.key == K_LEFT and self.snake.direction != "right":
-                        self.snake.move_left()
-                    if event.key == K_RIGHT and self.snake.direction != "left":
-                        self.snake.move_right()
+                    if event.key == K_RETURN:
+                        pause = False
+                    if not pause:
+                        if event.key == K_UP and self.snake.direction != "down":
+                            self.snake.move_up()
+                        if event.key == K_DOWN and self.snake.direction != "up":
+                            self.snake.move_down()
+                        if event.key == K_LEFT and self.snake.direction != "right":
+                            self.snake.move_left()
+                        if event.key == K_RIGHT and self.snake.direction != "left":
+                            self.snake.move_right()
                 elif event.type == QUIT:
                     running = False
-                
-            self.play()
+            try:    
+                if not pause:
+                    self.play()
+            except:
+                self.game_over()
+                pause = True
+                self.reset()
+
             time.sleep(0.2)
 
 if __name__ == "__main__":
